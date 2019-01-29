@@ -1,7 +1,7 @@
 # CombineWrapperListAdapter
 ListAdapter that can combine multiple adapters and puts them in a sequential order.
 Adapters can be both ```RecyclerView.Adapter``` and ```ListAdapter```.
-There are a few requirements: The Adapters within the CombineWrapperListAdapter all need to implement the ```WrappedListAdapter```-Interface and need to extend either ```ListAdapter\<T, RecyclerView.ViewHolder\>``` or  ```RecyclerView.Adapter\<RecyclerView.ViewHolder\>```. 
+There are a few requirements: The Adapters within the CombineWrapperListAdapter all need to implement the ```WrappedListAdapter```-Interface and need to extend either 'ListAdapter<T, RecyclerView.ViewHolder>' or  'RecyclerView.Adapter\<RecyclerView.ViewHolder\>'. 
 
 ## How to implement
 First Implement the ```WrappedListAdapter```-interface into the adapters that need to be combined, like this:
