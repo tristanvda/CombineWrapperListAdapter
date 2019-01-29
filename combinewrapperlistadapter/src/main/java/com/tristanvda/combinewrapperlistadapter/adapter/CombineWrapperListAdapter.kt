@@ -12,8 +12,7 @@ class CombineWrapperListAdapter :
 
     private var adapters: List<RecyclerView.Adapter<RecyclerView.ViewHolder>> = emptyList()
     private val viewTypes: SparseArrayCompat<WrappedListAdapter<Any>> = SparseArrayCompat()
-    private val dataObservers: MutableMap<RecyclerView.Adapter<RecyclerView.ViewHolder>, RecyclerView.AdapterDataObserver> =
-        mutableMapOf()
+    private val dataObservers: MutableMap<RecyclerView.Adapter<RecyclerView.ViewHolder>, RecyclerView.AdapterDataObserver> = mutableMapOf()
 
     data class WrapperAdapterItem(val adapter: WrappedListAdapter<Any>, val item: Any)
 
