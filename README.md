@@ -1,7 +1,7 @@
 # CombineWrapperListAdapter
 ListAdapter that can combine multiple adapters and puts them in a sequential order.
-Adapters can be both ```RecyclerView.Adapter``` and ```ListAdapter```. `
-There are a few requirements: The Adapters within the CombineWrapperListAdapter all need to implement the ```WrappedListAdapter```-Interface and need to extend either ```ListAdapter<T, RecyclerView.ViewHolder>``` or  ```RecyclerView.Adapter<RecyclerView.ViewHolder>```. 
+Adapters can be both ```RecyclerView.Adapter``` and ```ListAdapter```.
+There are a few requirements: The Adapters within the CombineWrapperListAdapter all need to implement the ```WrappedListAdapter```-Interface and need to extend either ```ListAdapter\<T, RecyclerView.ViewHolder\>``` or  ```RecyclerView.Adapter\<RecyclerView.ViewHolder\>```. 
 
 ## How to implement
 First Implement the ```WrappedListAdapter```-interface into the adapters that need to be combined, like this:
@@ -61,10 +61,10 @@ Now the adapters can be added to the CombineWrapperListAdapter:
     }
 ```
 
-Whenever data in the adapters gets updated/removed/changed call: ```notifyAdapterChanged()``` on the CombineWrapperListAdapter to let the listAdapter calculate the changes and update it's contents.
+Whenever data in the adapters gets updated/removed/changed call: ```notifyAdaptersChanged()``` on the CombineWrapperListAdapter to let the listAdapter calculate the changes and update it's contents.
 
 ## References
-https://developer.android.com/reference/android/widget/ListAdapter
+https://developer.android.com/reference/android/support/v7/recyclerview/extensions/ListAdapter
 
 ## License
 ```
