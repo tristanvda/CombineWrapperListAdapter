@@ -11,18 +11,18 @@ class CombineWrapperListAdapter :
     ListAdapter<CombineWrapperListAdapter.WrapperAdapterItem, RecyclerView.ViewHolder>(diffCallback) {
 
     private var adapters: List<RecyclerView.Adapter<RecyclerView.ViewHolder>> = emptyList()
-    private val viewTypes: SparseArrayCompat<WrappedListAdapter<Any, RecyclerView.ViewHolder>> = SparseArrayCompat()
+    private val viewTypes: SparseArrayCompat<WrappedListAdapter<Any>> = SparseArrayCompat()
     private val dataObservers: MutableMap<RecyclerView.Adapter<RecyclerView.ViewHolder>, RecyclerView.AdapterDataObserver> =
         mutableMapOf()
 
-    data class WrapperAdapterItem(val adapter: WrappedListAdapter<Any, RecyclerView.ViewHolder>, val item: Any)
+    data class WrapperAdapterItem(val adapter: WrappedListAdapter<Any>, val item: Any)
 
     /**
      * Implement this in an adapter to make it support the CombineWrapperListAdapter
      **/
-    interface WrappedListAdapter<T, VH : RecyclerView.ViewHolder> {
+    interface WrappedListAdapter<T> {
 
-        fun bindListItemViewHolder(holder: VH, item: T, payloads: List<Any> = emptyList())
+        fun bindListItemViewHolder(holder: RecyclerView.ViewHolder, item: T, payloads: List<Any> = emptyList())
 
         fun getItemViewType(item: T): Int
 
@@ -31,8 +31,8 @@ class CombineWrapperListAdapter :
         fun getDiffCallback(): DiffUtil.ItemCallback<T>
     }
 
-    fun add(adapter: RecyclerView.Adapter<*>) {
-        addAdapter(adapter as RecyclerView.Adapter<RecyclerView.ViewHolder>)
+    fun add(adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>) {
+        addAdapter(adapter)
     }
 
     fun remove(adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>) {
@@ -63,12 +63,13 @@ class CombineWrapperListAdapter :
         adapters = adapters + listOf(adapter)
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun notifyAdaptersChanged() {
         val adapterList = ArrayList<WrapperAdapterItem>()
 
         adapters.forEach { adapter ->
             try {
-                adapter as WrappedListAdapter<Any, RecyclerView.ViewHolder>
+                adapter as WrappedListAdapter<Any>
                 val items = adapter.getListItems()
                 adapterList.addAll(items.map { WrapperAdapterItem(adapter, it) })
             } catch (e: ClassCastException) {
@@ -152,8 +153,7 @@ class CombineWrapperListAdapter :
         return adapter.onFailedToRecycleView(holder)
     }
 
-    inner class WrapperDataObserver(private val adapter: RecyclerView.Adapter<*>) :
-        RecyclerView.AdapterDataObserver() {
+    inner class WrapperDataObserver(private val adapter: RecyclerView.Adapter<*>) : RecyclerView.AdapterDataObserver() {
         private val wrapperAdapter = this@CombineWrapperListAdapter
 
         override fun onChanged() {
@@ -161,37 +161,31 @@ class CombineWrapperListAdapter :
         }
 
         override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
-            val position = getStartPositionAdapter(adapter)
-            if (position != -1) wrapperAdapter.notifyItemRangeRemoved(position + positionStart, itemCount)
+            onAdapterPosition { start -> wrapperAdapter.notifyItemRangeRemoved(start + positionStart, itemCount) }
         }
 
         override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
-            val position = getStartPositionAdapter(adapter)
-            if (position != -1) wrapperAdapter.notifyItemMoved(position + fromPosition, position + toPosition)
+            onAdapterPosition { start -> wrapperAdapter.notifyItemMoved(start + fromPosition, start + toPosition) }
         }
 
         override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-            val position = getStartPositionAdapter(adapter)
-            if (position != -1) wrapperAdapter.notifyItemRangeInserted(position + positionStart, itemCount)
+            onAdapterPosition { start -> wrapperAdapter.notifyItemRangeInserted(start + positionStart, itemCount) }
         }
 
         override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
-            val position = getStartPositionAdapter(adapter)
-            if (position != -1) wrapperAdapter.notifyItemRangeChanged(position + positionStart, itemCount)
+            onAdapterPosition { start -> wrapperAdapter.notifyItemRangeChanged(start + positionStart, itemCount) }
         }
 
         override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
-            val position = getStartPositionAdapter(adapter)
-            if (position != -1) wrapperAdapter.notifyItemRangeChanged(position + positionStart, itemCount, payload)
+            onAdapterPosition { start -> wrapperAdapter.notifyItemRangeChanged(start + positionStart, itemCount, payload) }
         }
 
-        private fun getStartPositionAdapter(adapter: RecyclerView.Adapter<*>): Int {
+        private inline fun onAdapterPosition(task: (Int) -> Unit) {
             for (i in 0..wrapperAdapter.itemCount) {
                 if (wrapperAdapter.getItem(i).adapter == adapter) {
-                    return i
+                    task(i)
                 }
             }
-            return -1
         }
     }
 
@@ -200,12 +194,10 @@ class CombineWrapperListAdapter :
         private val diffCallback = object : DiffUtil.ItemCallback<WrapperAdapterItem>() {
 
             override fun areItemsTheSame(oldItem: WrapperAdapterItem, newItem: WrapperAdapterItem): Boolean =
-                oldItem.adapter == newItem.adapter
-                        && newItem.adapter.getDiffCallback().areItemsTheSame(oldItem.item, newItem.item)
+                oldItem.adapter == newItem.adapter && newItem.adapter.getDiffCallback().areItemsTheSame(oldItem.item, newItem.item)
 
             override fun areContentsTheSame(oldItem: WrapperAdapterItem, newItem: WrapperAdapterItem): Boolean =
-                oldItem.adapter == newItem.adapter
-                        && newItem.adapter.getDiffCallback().areContentsTheSame(oldItem.item, newItem.item)
+                oldItem.adapter == newItem.adapter && newItem.adapter.getDiffCallback().areContentsTheSame(oldItem.item, newItem.item)
 
             override fun getChangePayload(oldItem: WrapperAdapterItem, newItem: WrapperAdapterItem): Any? {
                 return if (oldItem.adapter == newItem.adapter) {

@@ -1,5 +1,6 @@
 package com.tristanvda.sample
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,5 +23,11 @@ class MainActivity : AppCompatActivity() {
         recycler_view.adapter = combineWrapperListAdapter
 
         combineWrapperListAdapter.add(wordAdapter)
+        combineWrapperListAdapter.add(colorAdapter)
+
+        wordAdapter.setItems(listOf("Combine", "Wrapper", "List", "Adapter"))
+        colorAdapter.setItems(listOf(Color.RED, Color.GREEN, Color.GRAY, Color.BLACK))
+
+        combineWrapperListAdapter.notifyAdaptersChanged()
     }
 }

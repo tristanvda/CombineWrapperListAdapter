@@ -10,10 +10,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tristanvda.combinewrapperlistadapter.adapter.CombineWrapperListAdapter
 import com.tristanvda.sample.R
 
-class ColorAdapter : ListAdapter<Int, ColorAdapter.ColorViewHolder>(diffCallback),
-    CombineWrapperListAdapter.WrappedListAdapter<Int, ColorAdapter.ColorViewHolder> {
+class ColorAdapter : ListAdapter<Int, RecyclerView.ViewHolder>(diffCallback),
+    CombineWrapperListAdapter.WrappedListAdapter<Int> {
 
-    private var colors: List<Int> = emptyList()
+    private var items: List<Int> = emptyList()
+
+    fun setItems(colors: List<Int>) {
+        this.items = colors
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ColorViewHolder {
         return ColorAdapter.ColorViewHolder(
@@ -21,22 +25,22 @@ class ColorAdapter : ListAdapter<Int, ColorAdapter.ColorViewHolder>(diffCallback
         )
     }
 
-    override fun onBindViewHolder(holder: ColorAdapter.ColorViewHolder, position: Int) {
-        bindListItemViewHolder(holder, colors[position], emptyList())
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        bindListItemViewHolder(holder, items[position], emptyList())
     }
 
-    override fun bindListItemViewHolder(holder: ColorViewHolder, item: Int, payloads: List<Any>) {
-        holder.bind(item)
+    override fun bindListItemViewHolder(holder: RecyclerView.ViewHolder, item: Int, payloads: List<Any>) {
+        (holder as ColorViewHolder).bind(item)
     }
 
     override fun getItemViewType(item: Int): Int = VIEW_TYPE_COLOR
 
-    override fun getListItems(): List<Int> = colors
+    override fun getListItems(): List<Int> = items
 
     override fun getDiffCallback(): DiffUtil.ItemCallback<Int> = diffCallback
 
     class ColorViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val colorView: TextView = itemView.findViewById(R.id.color_view)
+        private val colorView: View = itemView.findViewById(R.id.color_view)
 
         fun bind(color: Int) {
             colorView.setBackgroundColor(color)

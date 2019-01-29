@@ -10,8 +10,7 @@ import com.tristanvda.combinewrapperlistadapter.adapter.CombineWrapperListAdapte
 import com.tristanvda.sample.R
 
 class WordAdapter
-    : RecyclerView.Adapter<WordAdapter.WordViewHolder>(),
-    CombineWrapperListAdapter.WrappedListAdapter<String, WordAdapter.WordViewHolder> {
+    : RecyclerView.Adapter<RecyclerView.ViewHolder>(), CombineWrapperListAdapter.WrappedListAdapter<String> {
 
     private var list: List<String> = emptyList()
 
@@ -23,12 +22,12 @@ class WordAdapter
         return WordViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_word, parent, false))
     }
 
-    override fun onBindViewHolder(holder: WordViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         bindListItemViewHolder(holder, list[position], emptyList())
     }
 
-    override fun bindListItemViewHolder(holder: WordAdapter.WordViewHolder, item: String, payloads: List<Any>) {
-        holder.bind(item)
+    override fun bindListItemViewHolder(holder: RecyclerView.ViewHolder, item: String, payloads: List<Any>) {
+        (holder as WordViewHolder).bind(item)
     }
 
     override fun getItemCount(): Int = list.size
